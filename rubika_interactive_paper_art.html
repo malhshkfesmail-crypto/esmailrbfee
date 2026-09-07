@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>خدمات روبیکا — Interactive Paper Art</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap');
+:root{--paper:#f0eadc;--paper2:#e7dfce;--ink:#171717;--muted:#706b61;--blue:#26b9ff;--cyan:#73e6ff;--violet:#8d5cff;--pink:#e849d7;--line:rgba(20,20,20,.14);--shadow:0 24px 70px rgba(20,18,12,.18)}
+*{box-sizing:border-box}html,body{margin:0;background:#111;color:var(--ink);font-family:Vazirmatn,sans-serif}
+body{overflow-x:hidden}.grain{position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.11;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E")}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+#app{position:relative;min-height:100vh;background:radial-gradient(circle at 50% 20%,#fff8 0 5%,transparent 30%),linear-gradient(120deg,#e8e0d0,#f4efe5 48%,#e1d8c7);overflow:hidden}
+.grid{position:absolute;inset:0;opacity:.18;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,#000,transparent 85%)}
+.intro{position:fixed;inset:0;background:#0e0e0e;color:#f4efe5;z-index:100;display:grid;place-items:center;overflow:hidden}
+.introPaper{position:absolute;width:180vw;height:180vw;border-radius:50%;background:radial-gradient(circle,#eee8db 0 4%,#d9d0be 5% 14%,transparent 15%),#eee8db;transform:scale(0);filter:blur(1px)}
+.ink{position:absolute;width:25vw;height:25vw;border-radius:50%;background:radial-gradient(circle,#2b2520 0 20%,#0c0c0c 65%,transparent 70%);filter:blur(9px);transform:scale(0)}
+.introText{position:relative;z-index:3;text-align:center;opacity:0}.introText small{letter-spacing:.35em;color:#9de8ff}.introText h1{font-size:clamp(48px,9vw,130px);margin:15px 0;font-weight:900}
+main{position:relative;z-index:2;max-width:1500px;margin:auto;padding:38px 5vw 100px;min-height:100vh}
+.topMark{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.12em;color:#514c44}.stamp{border:2px solid #24211d;padding:9px 13px;transform:rotate(-3deg);font-weight:800}
+.hero{min-height:74vh;display:grid;place-items:center;position:relative}.heroCenter{text-align:center;position:relative;z-index:3}.eyebrow{font-size:12px;letter-spacing:.25em;color:#656057}.hero h1{font-size:clamp(58px,11vw,170px);line-height:.9;margin:18px 0;font-weight:900;letter-spacing:-.06em}.hero p{max-width:560px;margin:auto;color:#676158}
+.note{position:absolute;border:1px solid #302c26;background:#efe8da;padding:12px 15px;font-size:11px;box-shadow:8px 10px 0 #c9bfad;transform:rotate(-6deg)}.n1{top:20%;right:8%}.n2{bottom:20%;left:7%;transform:rotate(5deg)}.coord{position:absolute;font:10px monospace;color:#6f695e;opacity:.7}.c1{left:10%;top:16%}.c2{right:11%;bottom:17%}
+.services{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:30px}.service{min-height:290px;position:relative;cursor:pointer;transform-style:preserve-3d;transition:transform .15s}.sheet{position:absolute;inset:0;background:var(--paper);border:1px solid #bcb3a3;box-shadow:var(--shadow);padding:28px;clip-path:polygon(0 3%,97% 0,100% 95%,4% 100%);overflow:hidden}.sheet:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent 55%,#d6cdbc 55.3%,transparent 56%);opacity:.55}.service .glow{position:absolute;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,#65d9ff66,transparent 68%);filter:blur(18px);left:35%;top:25%;opacity:0;transition:.5s}.service:hover .glow{opacity:1}.service:hover .sheet{box-shadow:0 30px 80px #2a9fca33,0 20px 35px #302b2433}.icon{font-size:40px;margin-bottom:30px;filter:grayscale(1)}.service h2{font-size:28px;margin:0 0 8px}.service p{font-size:12px;color:#716b61}.tag{position:absolute;bottom:25px;left:25px;border:1px solid #35312b;padding:5px 9px;font-size:10px;background:#eee6d7}
+.detail{position:fixed;inset:0;background:#eee8dc;z-index:80;display:none;overflow:auto}.detail.open{display:block}.detailInner{min-height:100%;padding:35px 6vw 70px;position:relative}.back{border:1px solid #38332d;background:#e4dccb;padding:11px 18px;cursor:pointer;font-family:inherit}.detailGrid{max-width:1100px;margin:60px auto 0;display:grid;grid-template-columns:1.1fr .9fr;gap:45px;align-items:start}.detailTitle{font-size:clamp(45px,7vw,95px);line-height:1;margin:0 0 20px}.sub{color:#716a60}.measure{margin-top:35px;padding:28px;background:#e4dccb;border:1px solid #aaa090;box-shadow:12px 15px 0 #c9bfaf;position:relative}.range{width:100%;accent-color:#3dbbe8}.scale{display:flex;justify-content:space-between;font-size:10px;margin-top:10px;color:#6c665d}.quantity{font-size:55px;font-weight:900;margin:10px 0}.price{font-size:40px;font-weight:800}.price small{font-size:12px;color:#777}.modes{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}.mode{border:1px solid #70685c;background:#eee7d9;padding:12px 15px;cursor:pointer;font-family:inherit}.mode.active{background:#202020;color:#fff;box-shadow:5px 5px 0 #56d5ff}.warnings{display:grid;gap:10px;margin-top:25px}.warning{padding:13px 15px;background:#efe5c9;border-right:4px solid #222;font-size:11px}.order{margin-top:25px;width:100%;padding:17px;border:0;background:#181818;color:#fff;font-family:inherit;font-weight:800;font-size:17px;cursor:pointer;position:relative;overflow:hidden}.order:after{content:"";position:absolute;width:30px;height:30px;border-radius:50%;background:#65dbff;left:var(--x,50%);top:var(--y,50%);transform:translate(-50%,-50%) scale(0);opacity:.5;transition:transform .45s}.order:hover:after{transform:translate(-50%,-50%) scale(9)}.preview{min-height:470px;background:#e9e1d2;border:1px solid #bdb3a2;position:relative;box-shadow:20px 25px 0 #cbc1b0;overflow:hidden}.preview .paper{position:absolute;inset:45px;background:#f4eee2;border:1px solid #b6ac9b;transform:rotate(3deg);box-shadow:15px 20px 30px #5c524444}.preview:before,.preview:after{content:"";position:absolute;border:1px dashed #6d665c;inset:25px;opacity:.5}.preview:after{inset:auto 45px 45px auto;width:90px;height:35px;background:#171717;opacity:1;transform:rotate(-8deg)}.previewText{position:absolute;inset:110px 90px auto;text-align:center}.previewText b{font-size:42px}.modal{position:fixed;inset:0;z-index:120;background:#0008;display:none;place-items:center;padding:25px}.modal.open{display:grid}.modalPaper{max-width:500px;width:100%;background:#eee7da;padding:35px;box-shadow:18px 22px 0 #111;transform:rotate(-1deg)}.modalPaper h3{font-size:28px;margin-top:0}.modalPaper button{margin-top:20px;padding:13px 20px;border:1px solid #222;background:#ddd3c1;font-family:inherit;cursor:pointer}
+@media(max-width:850px){main{padding:25px 18px 60px}.services{grid-template-columns:1fr 1fr;gap:13px}.service{min-height:230px}.sheet{padding:19px}.service h2{font-size:22px}.icon{font-size:31px;margin-bottom:20px}.detailGrid{grid-template-columns:1fr;margin-top:35px}.preview{min-height:310px;order:-1}.detailTitle{font-size:50px}.n1{right:2%;top:13%}.n2{left:2%;bottom:13%}}
+@media(max-width:520px){.services{grid-template-columns:1fr}.service{min-height:200px}.hero{min-height:65vh}.hero h1{font-size:58px}.note{font-size:9px}.previewText{inset:90px 45px auto}.previewText b{font-size:29px}.measure{padding:20px}.quantity{font-size:44px}.price{font-size:31px}}
+</style>
+</head>
+<body>
+<div class="intro"><div class="ink"></div><div class="introPaper"></div><div class="introText"><small>RUBIKA / DIGITAL PAPER SYSTEM</small><h1>خدمات روبیکا</h1></div></div>
+<canvas id="fx"></canvas><div class="grain"></div>
+<div id="app"><div class="grid"></div>
+<main>
+<header class="topMark"><span>RUBIKA / 01</span><span class="stamp">DIGITAL ARTWORK</span></header>
+<section class="hero">
+<div class="coord c1">35°43' / 51°25'</div><div class="coord c2">SYSTEM_004 / PAPER_LAYER</div>
+<div class="note n1">024 cc</div><div class="note n2">INK → LIGHT → DIGITAL</div>
+<div class="heroCenter"><div class="eyebrow">025</div><h1>خدمات<br>روبیکا</h1><p>@mmsoOIONx</p></div>
+</section>
+<section class="services" id="services"></section>
+</main></div>
+
+<section class="detail" id="detail"><div class="detailInner"><button class="back" id="back">← بازگشت به اثر</button><div class="detailGrid"><div><div class="eyebrow" id="dEyebrow"></div><h1 class="detailTitle" id="dTitle"></h1><p class="sub" id="dSub"></p><div id="dControls"></div></div><div class="preview"><div class="paper"></div><div class="previewText"><span id="dIcon" style="font-size:42px"></span><br><b id="pTitle"></b><p id="pQty"></p><p id="pPrice"></p></div></div></div></div></section>
+<div class="modal" id="modal"><div class="modalPaper"><h3>ثبت سفارش</h3><p>برای ثبت سفارش، به آیدی <b>@psbxbcs</b> در روبیکا پیام دهید و تعداد موردنظر خود را ارسال کنید.</p><button id="closeModal">بستن</button></div></div>
+<script>
+const CONFIG={supportId:"@psbxbcs",follower:{min:100,max:5000,default:1000,pricePer1000:150000},member:{min:50,max:116000,default:1000,pricePer1000:400000},views:{min:100,max:20000,default:1000,custom:{pricePer1000:25000},last10:{pricePer1000:45000},last20:{pricePer1000:75000}},reactions:{min:100,max:20000,default:1000,pricePer1000:50000}};
+const DATA={
+ follower:{title:"فالوور",icon:"◎",desc:"فالوور واقعی پیج روبیکا (روبینو)",key:"follower"},
+ member:{title:"ممبر",icon:"◉",desc:"عضویت کانال یا گروه روبیکا",key:"member"},
+ views:{title:"ویو / بازدید",icon:"◌",desc:"بازدید پست‌ها و کانال روبیکا",key:"views"},
+ reactions:{title:"ری‌اکشن / واکنش",icon:"✦",desc:"افزایش واکنش دلخواه پست",key:"reactions"}
+};
+const services=document.getElementById('services');
+Object.entries(DATA).forEach(([key,s])=>{services.insertAdjacentHTML('beforeend',`<article class="service" data-service="${key}"><div class="glow"></div><div class="sheet"><div class="icon">${s.icon}</div><h2>${s.title}</h2><p>${s.desc}</p><span class="tag">OPEN / EXPLORE</span></div></article>`)});
+let current=null, qty=1000, mode='custom';
+const detail=document.getElementById('detail');
+const money=n=>Math.round(n).toLocaleString('fa-IR')+" تومان";
+function price(){let c=CONFIG[current];if(current==='views'){let p=CONFIG.views[mode].pricePer1000;return qty/1000*p}return qty/1000*c.pricePer1000}
+function renderControls(){
+ let html='';
+ if(current==='member')html+=`<div class="modes"><button class="mode ${mode==='channel'?'active':''}" data-mode="channel">ممبر کانال</button><button class="mode ${mode==='group'?'active':''}" data-mode="group">ممبر گروه</button></div>`;
+ if(current==='views')html+=`<div class="modes"><button class="mode ${mode==='custom'?'active':''}" data-mode="custom">پست دلخواه</button><button class="mode ${mode==='last10'?'active':''}" data-mode="last10">۱۰ پست آخر</button><button class="mode ${mode==='last20'?'active':''}" data-mode="last20">۲۰ پست آخر</button></div>`;
+ let c=CONFIG[current];html+=`<div class="measure"><div class="eyebrow">QUANTITY / MEASURING INSTRUMENT</div><div class="quantity" id="qty">${qty.toLocaleString('fa-IR')}</div><input id="range" class="range" type="range" min="${c.min}" max="${c.max}" value="${qty}" step="50"><div class="scale"><span>${c.min.toLocaleString('fa-IR')}</span><span>${Math.round((c.min+c.max)/2).toLocaleString('fa-IR')}</span><span>${c.max.toLocaleString('fa-IR')}</span></div><div class="price" id="price">${money(price())}</div></div>`;
+ if(current==='member')html+=`<div class="warnings"><div class="warning">⏱ زمان شروع: ۰ تا ۱۲ ساعت (معمولا آنی) · سرعت ارسال روزانه: بالا · کیفیت: فوق العاده · ریزش: ندارد</div><div class="warning">هرجا سوالی داشتید و یا نیاز به راهنمایی داشتید به پشتیبانی پیام دهید.</div><div class="warning">درصورت مشاهده محتوایی مغایر با قوانین سفارش شما سوخت خواهد شد.</div><div class="warning">امکان لغو سفارش و یا استرداد وجه وجود نخواهد داشت. اطلاعات سفارش را با دقت وارد کنید.</div><div class="warning">درحین انجام سفارش همزمان از ارائه دهنده دیگری سفارش ثبت نکنید.</div></div>`;
+ if(current==='views')html+=`<div class="warnings"><div class="warning">⏳ زمان شروع: 0 تا 1 ساعت · 🚀 سرعت ارسال روزانه: نامحدود</div><div class="warning">🔗 نحوه درج لینک: فقط آیدی کانال بدون @ · مثال: alireza</div><div class="warning">🔰 کانال عمومی باشد · هرجا سوالی داشتید به پشتیبانی پیام دهید.</div></div>`;
+ html+=`<button class="order" id="order">مهر ثبت سفارش</button>`;
+ document.getElementById('dControls').innerHTML=html;
+ const r=document.getElementById('range');r.oninput=()=>{qty=+r.value;animateNumber('qty',qty);animateNumber('price',price(),true);updatePreview()};
+ document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;renderControls();gsap.from('.measure,.warnings,.order',{y:20,opacity:0,duration:.55,stagger:.05,ease:"power3.out"})});
+ document.getElementById('order').onclick=()=>document.getElementById('modal').classList.add('open');
+}
+function animateNumber(id,val,moneyFlag=false){let el=document.getElementById(id);let from=+el.dataset.num||0;gsap.to({v:from},{v:val,duration:.65,ease:"power2.out",onUpdate(){el.textContent=Math.round(this.targets()[0].v).toLocaleString('fa-IR')+(moneyFlag?' تومان':'')},onStart(){el.dataset.num=val}})}
+function updatePreview(){document.getElementById('pQty').textContent=qty.toLocaleString('fa-IR')+" عدد";document.getElementById('pPrice').textContent=money(price())}
+function openService(key){
+ current=key;qty=CONFIG[key].default;mode=key==='views'?'custom':key==='member'?'channel':'custom';
+ const s=DATA[key];document.getElementById('dEyebrow').textContent='SERVICE / '+key.toUpperCase();document.getElementById('dTitle').textContent=s.title;document.getElementById('dSub').textContent=s.desc;document.getElementById('dIcon').textContent=s.icon;document.getElementById('pTitle').textContent=s.title;updatePreview();
+ detail.classList.add('open');document.body.style.overflow='hidden';
+ const tl=gsap.timeline();tl.fromTo(detail,{clipPath:'circle(0% at 50% 50%)'},{clipPath:'circle(150% at 50% 50%)',duration:1.1,ease:'power4.inOut'}).from('.detailGrid',{y:70,opacity:0,duration:.8,ease:'power3.out'},'-=.45').from('.preview .paper',{x:100,rotation:10,opacity:0,duration:.9,ease:'back.out(1.4)'},'-=.6').from('.measure,.warnings,.order',{y:25,opacity:0,duration:.7,stagger:.08},'-=.35');renderControls();
+}
+document.querySelectorAll('.service').forEach(el=>{el.addEventListener('mousemove',e=>{let r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;gsap.to(el,{rotationY:x*10,rotationX:-y*10,duration:.35});gsap.to(el.querySelector('.sheet'),{x:x*7,y:y*7,duration:.35})});el.addEventListener('mouseleave',()=>{gsap.to(el,{rotationY:0,rotationX:0,duration:.5});gsap.to(el.querySelector('.sheet'),{x:0,y:0,duration:.5})});el.onclick=()=>openService(el.dataset.service)});
+document.getElementById('back').onclick=()=>{gsap.to(detail,{clipPath:'circle(0% at 50% 50%)',duration:.8,ease:'power4.inOut',onComplete(){detail.classList.remove('open');document.body.style.overflow='auto';detail.style.clipPath='none'}})};
+document.getElementById('closeModal').onclick=()=>document.getElementById('modal').classList.remove('open');
+document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')e.currentTarget.classList.remove('open')};
+document.addEventListener('mousemove',e=>{document.documentElement.style.setProperty('--x',e.clientX+'px');document.documentElement.style.setProperty('--y',e.clientY+'px')});
+const intro=gsap.timeline({delay:.2});intro.to('.ink',{scale:1.5,duration:1.2,ease:'power2.out'}).to('.introPaper',{scale:1,duration:1.4,ease:'power3.inOut'},'-=.7').fromTo('.grid',{opacity:0},{opacity:.18,duration:.7}).to('.introText',{opacity:1,duration:.8}).to('.intro',{clipPath:'circle(150% at 50% 50%)',duration:1.6,ease:'power4.inOut',delay:.55}).set('.intro',{display:'none'});
+const canvas=document.getElementById('fx'),ctx=canvas.getContext('2d');let W,H,pts=[];
+function resize(){W=canvas.width=innerWidth*devicePixelRatio;H=canvas.height=innerHeight*devicePixelRatio;ctx.scale(devicePixelRatio,devicePixelRatio);W=innerWidth;H=innerHeight}
+resize();addEventListener('resize',()=>{ctx.setTransform(1,0,0,1,0,0);resize()});for(let i=0;i<70;i++)pts.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.7,v:Math.random()*.25+.05});
+function draw(){ctx.clearRect(0,0,innerWidth,innerHeight);pts.forEach(p=>{p.y-=p.v;if(p.y<0)p.y=innerHeight;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(40,140,190,.22)';ctx.fill()});requestAnimationFrame(draw)}draw();
+if(window.Lenis){const lenis=new Lenis({smoothWheel:true});function raf(t){lenis.raf(t);requestAnimationFrame(raf)}requestAnimationFrame(raf)}
+</script>
+</body>
+</html>22)';ctx.fill()});requestAnimationFrame(draw)}draw();
+if(window.Lenis){const lenis=new Lenis({smoothWheel:true});function raf(t){lenis.raf(t);requestAnimationFrame(raf)}requestAnimationFrame(raf)}
+</script>
+</body>
+</html>
